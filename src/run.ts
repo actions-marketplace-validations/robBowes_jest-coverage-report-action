@@ -8,7 +8,6 @@ import { formatCoverageAnnotations } from './format/annotations/formatCoverageAn
 import { formatFailedTestsAnnotations } from './format/annotations/formatFailedTestsAnnotations';
 import { generateCommitReport } from './report/generateCommitReport';
 import { generatePRReport } from './report/generatePRReport';
-import { checkThreshold } from './stages/checkThreshold';
 import { createReport } from './stages/createReport';
 import { getCoverage } from './stages/getCoverage';
 import { switchBack, switchBranch } from './stages/switchBranch';
@@ -111,28 +110,13 @@ export const run = async (
         dataCollector.add(baseCoverage);
     }
 
-    const [, thresholdResults] = await runStage(
-        'checkThreshold',
-        dataCollector,
-        async (skip) => {
-            if (!isHeadCoverageGenerated || !isThresholdParsed) {
-                skip();
-            }
 
-            return checkThreshold(
-                headCoverage!,
-                threshold!,
-                options.workingDirectory,
-                dataCollector as DataCollector<unknown>
-            );
-        }
-    );
 
     const [isReportContentGenerated, summaryReport] = await runStage(
         'generateReportContent',
         dataCollector,
         async () => {
-            return createReport(dataCollector, options, thresholdResults ?? []);
+            return createReport(dataCollector, options,  []);
         }
     );
 
